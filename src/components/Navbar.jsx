@@ -168,6 +168,7 @@ const Navbar = (props) => (
           <Link to="/cart">
             <i
               className="fa fa-shopping-cart"
+              onMouseEnter={props.showCartPreview}
             ></i>
           </Link>
           <a href="/">

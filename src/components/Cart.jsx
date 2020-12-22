@@ -118,7 +118,7 @@ class Cart extends Component {
         <div className="Cart">
           <section className="game-list mt-5">
             <div className="container">
-              <div className="row">
+              <div className="row no-gutters">
                 {loading ? (
                   <div className="position-relative w-100 h-100">
                     <Spinner
@@ -136,7 +136,7 @@ class Cart extends Component {
                   <>
                     {cart.map((game) => (
                       <div
-                        className="col-sm-12 col-md-6 col-lg-3"
+                        className="col-sm-12 col-md-6 col-lg-3 px-1"
                         key={game.id}
                       >
                         <div className="card game-card mb-3">
@@ -186,12 +186,14 @@ class Cart extends Component {
                         </div>
                       </div>
                     ))}
-                    <Button
-                      className="gog-btn mt-2 gog-btn-primary w-100"
-                      onClick={this.completeOrder}
-                    >
-                      Complete order
-                    </Button>
+                    <div className="col-12 px-1">
+                      <Button
+                        className="gog-btn mt-2 gog-btn-primary w-100"
+                        onClick={this.completeOrder}
+                      >
+                        Complete order
+                      </Button>
+                    </div>
                   </>
                 ) : (
                   <div>YOUR CART IS EMPTY</div>

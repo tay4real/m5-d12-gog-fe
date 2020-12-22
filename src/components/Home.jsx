@@ -1,19 +1,39 @@
 import React, { Component } from "react";
 import Carousel from "./Carousel";
 import { Button, Spinner } from "react-bootstrap";
-
+import CartPreview from "./CartPreview";
 class Home extends Component {
   state = {
     games: [],
+    cart: [],
     loading: true,
     error: null,
     cartLoading: null,
   };
 
-  componentDidMount = async () => {
+  fetchCart = async () => {
+    try {
+      const resp = await fetch(process.env.REACT_APP_BE + "cart");
+      if (resp.ok) {
+        let cart = await resp.json();
+        setTimeout(() => {
+          this.setState({
+            cart,
+            loading: false,
+            error: null,
+          });
+        }, 500);
+      } else {
+        this.setState({ loading: false, error: "500 - Server error" });
+      }
+    } catch (e) {
+      this.setState({ loading: false, error: "500 - Server error" });
+    }
+  };
+
+  fetchGames = async () => {
     try {
       const resp = await fetch(process.env.REACT_APP_BE + "games");
-      // http://localhost:3001/games
       if (resp.ok) {
         let games = await resp.json();
         setTimeout(() => {
@@ -24,18 +44,19 @@ class Home extends Component {
           });
         }, 500);
       } else {
-        this.setState({
-          loading: false,
-          error: "500 - Server error",
-        });
+        this.setState({ loading: false, error: "500 - Server error" });
       }
     } catch (e) {
-      this.setState({
-        loading: false,
-        error: "500 - Server error",
-      });
+      this.setState({ loading: false, error: "500 - Server error" });
     }
   };
+
+  componentDidMount() {
+    this.fetchGames();
+    this.fetchCart();
+
+    this.props.hideCartPreview(); // prevents state remaining true after a page change
+  }
 
   addToCart = async (id) => {
     try {
@@ -50,10 +71,15 @@ class Home extends Component {
           // http://localhost:3001/cart/lksjdkasaad
           if (resp.ok) {
             setTimeout(() => {
-              this.setState({
-                cartLoading: null,
-                error: null,
-              });
+              this.setState(
+                {
+                  cartLoading: null,
+                  error: null,
+                },
+                async () => {
+                  await this.fetchCart();
+                }
+              );
             }, 500);
           } else {
             this.setState({
@@ -72,6 +98,8 @@ class Home extends Component {
   };
 
   render() {
+    const { games, cart } = this.state;
+    const { hideCartPreview, showCartPreview } = this.props;
     return (
       <div className="position-relative">
         <div className="container">
@@ -88,7 +116,7 @@ class Home extends Component {
         <section className="game-list mt-5">
           <div className="container">
             <div className="row">
-              {this.state.games.map((game) => (
+              {games.map((game) => (
                 <div className="col-sm-12 col-md-6 col-lg-3" key={game.id}>
                   <div className="card game-card mb-3">
                     <img
@@ -798,6 +826,12 @@ class Home extends Component {
             </div>
           </div>
         </div>
+        <CartPreview
+          cart={cart}
+          show={showCartPreview}
+          hideCartPreview={hideCartPreview}
+          fetchCart={this.fetchCart}
+        />
       </div>
     );
   }

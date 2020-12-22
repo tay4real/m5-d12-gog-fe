@@ -21,13 +21,33 @@ class App extends Component {
     this.setState({ showLogin: false });
   };
 
+  handleShowCartPreview = () => {
+    this.setState({ showCartPreview: true });
+  };
+  handleHideCartPreview = () => {
+    this.setState({ showCartPreview: false });
+  };
+
   render() {
-    const { showLogin } = this.state;
+    const { showLogin, showCartPreview } = this.state;
     return (
       <div className="App">
         <Router>
-          <Navbar openLogin={this.handleShowLogin} />
-          <Route path="/" exact render={(routerProps) => <Home {...routerProps} />} />
+          <Navbar
+            openLogin={this.handleShowLogin}
+            showCartPreview={this.handleShowCartPreview}
+          />
+          <Route
+            path="/"
+            exact
+            render={(routerProps) => (
+              <Home
+                {...routerProps}
+                showCartPreview={showCartPreview}
+                hideCartPreview={this.handleHideCartPreview}
+              />
+            )}
+          />
           <Route path="/cart" exact component={Cart} />
           <Login showLogin={showLogin} closeLogin={this.handleHideLogin} />
           <Footer />
