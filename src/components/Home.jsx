@@ -1,68 +1,75 @@
 import React, { Component } from "react";
 import Carousel from "./Carousel";
-import {Button} from 'react-bootstrap'
+import { Button, Spinner } from "react-bootstrap";
 
 class Home extends Component {
   state = {
     games: [],
     loading: true,
     error: null,
-    cartLoading: false
+    cartLoading: null,
   };
 
   componentDidMount = async () => {
     try {
-      const resp = await fetch(process.env.REACT_APP_BE + "games")
+      const resp = await fetch(process.env.REACT_APP_BE + "games");
       // http://localhost:3001/games
-      if(resp.ok) {
-        let games = await resp.json()
+      if (resp.ok) {
+        let games = await resp.json();
         setTimeout(() => {
           this.setState({
             games,
             loading: false,
-            error: null
-          })
+            error: null,
+          });
         }, 500);
       } else {
         this.setState({
           loading: false,
-          error: '500 - Server error'
-        })
+          error: "500 - Server error",
+        });
       }
-    } catch(e) {
-        this.setState({
-          loading: false,
-          error: '500 - Server error'
-        })
+    } catch (e) {
+      this.setState({
+        loading: false,
+        error: "500 - Server error",
+      });
     }
-  }
+  };
 
-  addToCart = async(id) => {
+  addToCart = async (id) => {
     try {
-      const resp = await fetch(process.env.REACT_APP_BE + "cart/" + id, {
-        method: 'POST'
-      })
-      // http://localhost:3001/cart/lksjdkasaad
-      if(resp.ok) {
-        setTimeout(() => {
-          this.setState({
-            cartLoading: false,
-            error: null
-          })
-        }, 500);
-      } else {
-        this.setState({
-          cartLoading: false,
-          error: '500 - Server error'
-        })
-      }
-    } catch(e) {
-        this.setState({
-          cartLoading: false,
-          error: '500 - Server error'
-        })
+      this.setState(
+        {
+          cartLoading: id,
+        },
+        async () => {
+          const resp = await fetch(process.env.REACT_APP_BE + "cart/" + id, {
+            method: "POST",
+          });
+          // http://localhost:3001/cart/lksjdkasaad
+          if (resp.ok) {
+            setTimeout(() => {
+              this.setState({
+                cartLoading: null,
+                error: null,
+              });
+            }, 500);
+          } else {
+            this.setState({
+              cartLoading: null,
+              error: "500 - Server error",
+            });
+          }
+        }
+      );
+    } catch (e) {
+      this.setState({
+        cartLoading: null,
+        error: "500 - Server error",
+      });
     }
-  }
+  };
 
   render() {
     return (
@@ -81,38 +88,50 @@ class Home extends Component {
         <section className="game-list mt-5">
           <div className="container">
             <div className="row">
-              {
-                this.state.games.map((game) => (
-                  <div className="col-sm-12 col-md-6 col-lg-3" key={game.id}>
-                    <div className="card game-card mb-3">
-                      <img src={game.image} className="card-img-top section-list"
-                      alt="card-img" style={{
-                        height: '10rem',
-                        objectFit: 'cover',
-                        objectPosition: 'top'
-
-                      }} />
-                      <div className="card-body">
-                        <span className="card-title mb-0">{game.title}</span>
-                        <div className="product-info">
-                          <div>
-                            <i className="fa fa-windows" aria-hidden="true"></i>
-                          </div>
-                          <Button variant="success" size="sm"
-                            className="gog-btn gog-btn-primary game-add-to-cart mx-2"
-                            onClick={() => this.addToCart(game.id)}
-                          >
-                            Add to cart
-                          </Button>
-                          <div className="price text-dark">
-                            {`$${game.price}`}
-                          </div>
+              {this.state.games.map((game) => (
+                <div className="col-sm-12 col-md-6 col-lg-3" key={game.id}>
+                  <div className="card game-card mb-3">
+                    <img
+                      src={game.image}
+                      className="card-img-top section-list"
+                      alt="card-img"
+                      style={{
+                        height: "10rem",
+                        objectFit: "cover",
+                        objectPosition: "top",
+                      }}
+                    />
+                    <div className="card-body">
+                      <span className="card-title mb-0">{game.title}</span>
+                      <div className="product-info">
+                        <div>
+                          <i className="fa fa-windows" aria-hidden="true"></i>
+                        </div>
+                        <Button
+                          variant="success"
+                          size="sm"
+                          className="gog-btn gog-btn-primary game-add-to-cart mx-2"
+                          onClick={() => this.addToCart(game.id)}
+                        >
+                          Add to cart
+                          {this.state.cartLoading &&
+                            this.state.cartLoading === game.id && (
+                              <Spinner
+                                animation="border"
+                                variant="light"
+                                size="sm"
+                                className="ml-2"
+                              />
+                            )}
+                        </Button>
+                        <div className="price text-dark">
+                          {`$${game.price}`}
                         </div>
                       </div>
                     </div>
-                  </div >
-                ))
-              }
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </section>

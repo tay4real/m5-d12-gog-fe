@@ -3,6 +3,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Login from "./components/Login";
 import Home from "./components/Home";
+import Cart from "./components/Cart";
 import { BrowserRouter as Router, Route } from "react-router-dom";
 
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -26,7 +27,8 @@ class App extends Component {
       <div className="App">
         <Router>
           <Navbar openLogin={this.handleShowLogin} />
-          <Route path="/" exact render={(props) => <Home {...props} />} />
+          <Route path="/" exact render={(routerProps) => <Home {...routerProps} />} />
+          <Route path="/cart" exact component={Cart} />
           <Login showLogin={showLogin} closeLogin={this.handleHideLogin} />
           <Footer />
         </Router>
